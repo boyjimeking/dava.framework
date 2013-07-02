@@ -62,7 +62,7 @@ void FilePath::AddResourcesFolder(const FilePath & folder)
     {
         if(folder == *it)
         {
-            DVASSERT(false);
+			return;
         }
     }
     
@@ -90,11 +90,6 @@ const List<FilePath> FilePath::GetResourcesFolders()
     return resourceFolders;
 }
     
-void FilePath::CleanResourcesFolders()
-{
-    resourceFolders.clear();
-}
-
     
 #if defined(__DAVAENGINE_WIN32__)
 void FilePath::InitializeBundleName()
@@ -686,6 +681,33 @@ String FilePath::AbsoluteToRelative(const FilePath &directoryPathname, const Fil
     }
     
     return (retPath + absolutePathname.GetFilename());
+}
+
+String FilePath::GetLongestMatchResourceFolders( const FilePath &absolutePathname)
+{
+	String pathToCompare = absolutePathname.GetDirectory().GetAbsolutePathname();
+	String retValue = resourceFolders.front().GetAbsolutePathname();
+	int32 maxCharactersCommon = 0 ;
+	for(List<FilePath>::const_iterator it = resourceFolders.begin(); it != resourceFolders.end(); ++it)
+	{
+		String resFolder = it->GetAbsolutePathname();
+		std::pair<String::const_iterator , String::const_iterator> p = 
+			std::mismatch(resFolder.begin(), resFolder.end(), pathToCompare.begin()) ;
+		if ((p.first - resFolder.begin()) > maxCharactersCommon ) 
+		{
+			 maxCharactersCommon = p.first - resFolder.begin() ;
+		}
+		retValue = resFolder.substr(0, maxCharactersCommon);
+	}
+	return retValue;
+}
+
+String FilePath::GetBestRelativePath()
+{
+	String convinientPath = FilePath::GetLongestMatchResourceFolders(GetAbsolutePathname());
+	String pathname = GetRelativePathname(convinientPath);
+	pathname.replace(0, 4, "~res:");
+	return pathname;
 }
     
 bool FilePath::IsAbsolutePathname() const

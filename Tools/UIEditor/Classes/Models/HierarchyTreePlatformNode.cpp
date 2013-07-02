@@ -154,8 +154,10 @@ void HierarchyTreePlatformNode::ActivatePlatform()
 	{
 		String bundleName = rootNode->GetProjectDir().toStdString();
         //after platform ativation only one item(projDir) should be placed to it
-		FilePath::CleanResourcesFolders();
-		FilePath::SetBundleName(bundleName);
+		//FilePath::CleanResourcesFolders();
+		FilePath tmp(bundleName);
+		tmp.MakeDirectoryPathname();
+		FilePath::AddResourcesFolder(tmp);
 	}
 }
 
@@ -329,9 +331,11 @@ bool HierarchyTreePlatformNode::SaveLocalization(YamlNode* platform)
 	this->localizationPath.MakeDirectoryPathname();
 
 	//TODO VK: Fix FilePath::GetFrameworkPath()
-	String pathname = this->localizationPath.GetRelativePathname(FilePath::GetBundleName());
+	/*String convinientPath = FilePath::GetMostConvinientResourceFolderForPath(this->localizationPath.GetAbsolutePathname());
+	String pathname = this->localizationPath.GetRelativePathname(convinientPath);
 	pathname.replace(0, 4, "~res:");
-
+	*/
+	String pathname = this->localizationPath.GetBestRelativePath();
     platform->Set(LOCALIZATION_PATH_NODE, pathname);
     platform->Set(LOCALIZATION_LOCALE_NODE, locale);
 

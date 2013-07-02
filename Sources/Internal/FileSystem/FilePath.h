@@ -232,9 +232,7 @@ public:
     static void AddResourcesFolder(const FilePath & folder);
     static void RemoveResourcesFolder(const FilePath & folder);
     static const List<FilePath> GetResourcesFolders();
-    static void CleanResourcesFolders();
-    
-    
+        
     /**
         \brief Function to check if path is absolute
         \returns true if path is absolute
@@ -243,13 +241,16 @@ public:
 
     
     bool Exists() const;
-    
+   
+	String GetBestRelativePath();
+
 protected:
     
     void Initialize(const String &pathname);
 
     String ResolveResourcesPath() const;
     
+	static String GetLongestMatchResourceFolders( const FilePath &absolutePathname);
 
     static String NormalizePathname(const FilePath &pathname);
     static String NormalizePathname(const String &pathname);
